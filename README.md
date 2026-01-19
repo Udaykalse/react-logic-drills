@@ -25,4 +25,4 @@ Focuses on backend fundamentals using Express.js.
 ## 🛠️ Getting Started
 1. **Clone the repo:**
    ```bash
-   git clone [https://github.com/YOUR_USERNAME/fullstack-interview-prep.git](https://github.com/YOUR_USERNAME/fullstack-interview-prep.git)
+   git clone [https://github.com/Udaykalse/react-logic-drills]
