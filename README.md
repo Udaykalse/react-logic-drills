@@ -25,4 +25,4 @@ Focuses on backend fundamentals using Express.js.
 ## 🛠️ Getting Started
 1. **Clone the repo:**
    ```bash
-   git clone [https://github.com/Udaykalse/react-logic-drills]
+   git clone https://github.com/Udaykalse/react-logic-drills
