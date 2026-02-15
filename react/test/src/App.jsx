@@ -20,12 +20,17 @@ import Demo3 from "./D2/Demo3";
 import Demo5 from "./D2/Demo5";
 import Demo6 from "./D2/Demo6";
 import Demo7 from "./D2/Demo7";
+import Test1 from "./D3/Test1";
+import Test2 from "./D3/Test2";
+import { useState } from "react";
+import Test3 from "./D3/Test3";
 
 export default function App() {
+  const [open, setOpen] = useState(true);
   return (
     <BrowserRouter>
       <Routes>
-        {/* Parent Route */}
+        {/* https://react-logic-drills.vercel.app/todo */}
         <Route path="/" element={<Layout />}>
           {/* Default Route */}
           <Route index element={<Navigate to="/filter" />} />
@@ -48,6 +53,12 @@ export default function App() {
           <Route path="demo5" element={<Demo5 />} />{" "}
           <Route path="demo6" element={<Demo6 />} />
           <Route path="demo7" element={<Demo7 />} />
+          <Route path="test1" element={<Test1 />} />
+          <Route
+            path="test2"
+            element={<Test2 open={open} onClose={() => setOpen(false)} />}
+          />
+          <Route path="test3" element={<Test3 />} />
           {/* 404 Route */}
           <Route path="*" element={<h2>Page Not Found</h2>} />
         </Route>

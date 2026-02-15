@@ -17,13 +17,17 @@ export default function Layout() {
         <Link to="/demo1">Demo1</Link>
         <Link to="/demo2">Demo2</Link>
         <Link to="/demo3">Demo3</Link>
-        <Link to="/demo4">Demo4</Link> 
+        <Link to="/demo4">Demo4</Link>
         <Link to="/demo5">Demo5</Link>
         <Link to="/demo6">Demo6</Link>
         <Link to="/demo7">Demo7</Link>
         <Link to="/demo8">Demo8</Link>
         <Link to="/demo9">Demo9</Link>
         <Link to="/demo10">Demo10</Link>
+        <Link to="/test1">Debounced</Link>
+        <Link to="/test2">Modal</Link>
+        <Link to="/test3">Infinite Scroll</Link>
+
       </nav>
 
       <hr />
