@@ -5,6 +5,1201 @@ TypeScript
 Email
 
 
+import { useState } from "react";
+
+const problems = [
+  {
+    id: 1,
+    type: "UI",
+    difficulty: "Easy",
+    title: "Toggle Button",
+    description: "Create a button that toggles between 'ON' and 'OFF' states, changing its background color accordingly.",
+    code: `import { useState } from "react";
+
+function ToggleButton() {
+  const [isOn, setIsOn] = useState(false);
+
+  return (
+    <button
+      onClick={() => setIsOn(!isOn)}
+      style={{
+        padding: "10px 24px",
+        borderRadius: "6px",
+        border: "none",
+        cursor: "pointer",
+        backgroundColor: isOn ? "#22c55e" : "#ef4444",
+        color: "white",
+        fontSize: "16px",
+        fontWeight: "bold",
+        transition: "background-color 0.3s"
+      }}
+    >
+      {isOn ? "ON" : "OFF"}
+    </button>
+  );
+}
+
+export default ToggleButton;`,
+    concepts: ["useState", "Event Handling", "Conditional Rendering"],
+    explanation: "We use useState to track the toggle state. The onClick handler flips the boolean value. Conditional rendering is used for label and backgroundColor.",
+  },
+  {
+    id: 2,
+    type: "Coding",
+    difficulty: "Easy",
+    title: "Counter with Min/Max",
+    description: "Build a counter with increment and decrement buttons. The counter should not go below 0 or above 10.",
+    code: `import { useState } from "react";
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  const increment = () => setCount(prev => Math.min(prev + 1, 10));
+  const decrement = () => setCount(prev => Math.max(prev - 1, 0));
+
+  return (
+    <div>
+      <button onClick={decrement} disabled={count === 0}>-</button>
+      <span style={{ margin: "0 16px", fontSize: "24px" }}>{count}</span>
+      <button onClick={increment} disabled={count === 10}>+</button>
+    </div>
+  );
+}
+
+export default Counter;`,
+    concepts: ["useState", "Functional Updates", "Disabled State"],
+    explanation: "Math.min and Math.max enforce boundaries. We use functional updates (prev =>) to ensure we always operate on the latest state. The disabled prop prevents out-of-range clicks.",
+  },
+  {
+    id: 3,
+    type: "UI",
+    difficulty: "Easy",
+    title: "Controlled Form Input",
+    description: "Create a controlled input field that displays the typed text in real-time below the input.",
+    code: `import { useState } from "react";
+
+function LiveInput() {
+  const [text, setText] = useState("");
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="Type something..."
+        style={{ padding: "8px", fontSize: "16px", width: "300px" }}
+      />
+      <p>Live: <strong>{text || "(empty)"}</strong></p>
+    </div>
+  );
+}
+
+export default LiveInput;`,
+    concepts: ["Controlled Components", "onChange", "useState"],
+    explanation: "In a controlled input, React state is the single source of truth. value={text} makes input controlled, onChange updates state on every keystroke keeping UI in sync.",
+  },
+  {
+    id: 4,
+    type: "Scenario",
+    difficulty: "Easy",
+    title: "Todo List",
+    description: "Build a simple Todo List where users can add new tasks and mark tasks as complete by clicking on them.",
+    code: `import { useState } from "react";
+
+function TodoList() {
+  const [todos, setTodos] = useState([]);
+  const [input, setInput] = useState("");
+
+  const addTodo = () => {
+    if (!input.trim()) return;
+    setTodos([...todos, { id: Date.now(), text: input, done: false }]);
+    setInput("");
+  };
+
+  const toggleTodo = (id) => {
+    setTodos(todos.map(todo =>
+      todo.id === id ? { ...todo, done: !todo.done } : todo
+    ));
+  };
+
+  return (
+    <div>
+      <input value={input} onChange={e => setInput(e.target.value)} placeholder="Add task..." />
+      <button onClick={addTodo}>Add</button>
+      <ul>
+        {todos.map(todo => (
+          <li key={todo.id}
+            onClick={() => toggleTodo(todo.id)}
+            style={{ textDecoration: todo.done ? "line-through" : "none", cursor: "pointer" }}>
+            {todo.text}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default TodoList;`,
+    concepts: ["useState", "Array Immutability", "List Rendering", "key prop"],
+    explanation: "Each todo has a unique id (Date.now()). We use .map() to toggle a specific todo immutably by spreading and updating only the matching id. The key prop helps React reconcile the list efficiently.",
+  },
+  {
+    id: 5,
+    type: "Coding",
+    difficulty: "Medium",
+    title: "useEffect – Fetch Data",
+    description: "Fetch and display a list of users from a public API when the component mounts. Show a loading state while fetching.",
+    code: `import { useState, useEffect } from "react";
+
+function UserList() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then(res => res.json())
+      .then(data => {
+        setUsers(data);
+        setLoading(false);
+      });
+  }, []); // Empty array = run once on mount
+
+  if (loading) return <p>Loading...</p>;
+
+  return (
+    <ul>
+      {users.map(user => (
+        <li key={user.id}>{user.name} – {user.email}</li>
+      ))}
+    </ul>
+  );
+}
+
+export default UserList;`,
+    concepts: ["useEffect", "Dependency Array", "Async Data Fetching", "Loading State"],
+    explanation: "useEffect with an empty dependency array [] runs only on mount — equivalent to componentDidMount. We track loading state separately to conditionally render a spinner or the data.",
+  },
+  {
+    id: 6,
+    type: "Scenario",
+    difficulty: "Medium",
+    title: "Search Filter",
+    description: "Given a list of country names, render a search input that filters the list in real-time as the user types.",
+    code: `import { useState } from "react";
+
+const countries = ["India", "USA", "Germany", "France", "Japan", "Brazil", "Canada", "Australia"];
+
+function SearchFilter() {
+  const [query, setQuery] = useState("");
+
+  const filtered = countries.filter(c =>
+    c.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    <div>
+      <input
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+        placeholder="Search country..."
+      />
+      <ul>
+        {filtered.length > 0
+          ? filtered.map(c => <li key={c}>{c}</li>)
+          : <li>No results found</li>}
+      </ul>
+    </div>
+  );
+}
+
+export default SearchFilter;`,
+    concepts: ["Derived State", "Array.filter", "Controlled Input"],
+    explanation: "The filtered list is derived from state — no need for a separate state for it. Case-insensitive matching with .toLowerCase() ensures better UX. This is the 'single source of truth' principle.",
+  },
+  {
+    id: 7,
+    type: "UI",
+    difficulty: "Medium",
+    title: "Accordion Component",
+    description: "Build an accordion where clicking a question expands/collapses its answer. Only one item should be open at a time.",
+    code: `import { useState } from "react";
+
+const faqs = [
+  { q: "What is React?", a: "A JS library for building UIs." },
+  { q: "What is JSX?", a: "JSX lets you write HTML inside JavaScript." },
+  { q: "What are hooks?", a: "Functions that let you use state in functional components." },
+];
+
+function Accordion() {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggle = (i) => setOpenIndex(openIndex === i ? null : i);
+
+  return (
+    <div>
+      {faqs.map((faq, i) => (
+        <div key={i} style={{ marginBottom: "8px", border: "1px solid #ddd", borderRadius: "6px" }}>
+          <button
+            onClick={() => toggle(i)}
+            style={{ width: "100%", padding: "12px", textAlign: "left", background: openIndex === i ? "#e0f2fe" : "#fff", border: "none", cursor: "pointer", fontWeight: "bold" }}>
+            {faq.q}
+          </button>
+          {openIndex === i && <p style={{ padding: "12px", margin: 0 }}>{faq.a}</p>}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default Accordion;`,
+    concepts: ["Exclusive State", "Conditional Rendering", "Index Tracking"],
+    explanation: "Storing a single openIndex instead of an array ensures only one item is open. Clicking an already-open item sets openIndex to null (closing it). This is cleaner than managing multiple booleans.",
+  },
+  {
+    id: 8,
+    type: "Coding",
+    difficulty: "Medium",
+    title: "useCallback – Prevent Re-renders",
+    description: "Explain and demonstrate useCallback to prevent a child component from re-rendering unnecessarily when parent state changes.",
+    code: `import { useState, useCallback, memo } from "react";
+
+// memo prevents re-render if props haven't changed
+const Button = memo(({ onClick, label }) => {
+  console.log("Button rendered:", label);
+  return <button onClick={onClick}>{label}</button>;
+});
+
+function Parent() {
+  const [count, setCount] = useState(0);
+  const [other, setOther] = useState(0);
+
+  // Without useCallback: new function reference on every render
+  // With useCallback: same reference if deps don't change
+  const increment = useCallback(() => setCount(c => c + 1), []);
+
+  return (
+    <div>
+      <p>Count: {count} | Other: {other}</p>
+      <Button onClick={increment} label="Increment Count" />
+      <button onClick={() => setOther(o => o + 1)}>Change Other</button>
+    </div>
+  );
+}
+
+export default Parent;`,
+    concepts: ["useCallback", "React.memo", "Referential Equality", "Performance"],
+    explanation: "Every render creates new function references. Without useCallback, even memo'd children re-render because they receive a 'new' function prop each time. useCallback memoizes the function so reference equality is maintained.",
+  },
+  {
+    id: 9,
+    type: "Scenario",
+    difficulty: "Medium",
+    title: "Form Validation",
+    description: "Build a registration form with name, email, and password fields. Validate each field and show error messages on submit.",
+    code: `import { useState } from "react";
+
+function RegistrationForm() {
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const errs = {};
+    if (!form.name.trim()) errs.name = "Name is required";
+    if (!/\S+@\S+\.\S+/.test(form.email)) errs.email = "Invalid email";
+    if (form.password.length < 6) errs.password = "Min 6 characters";
+    return errs;
+  };
+
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const errs = validate();
+    if (Object.keys(errs).length > 0) return setErrors(errs);
+    alert("Registration successful!");
+    setErrors({});
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {["name", "email", "password"].map(field => (
+        <div key={field} style={{ marginBottom: "12px" }}>
+          <input
+            name={field}
+            type={field === "password" ? "password" : "text"}
+            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+            value={form[field]}
+            onChange={handleChange}
+          />
+          {errors[field] && <p style={{ color: "red", margin: 0, fontSize: "12px" }}>{errors[field]}</p>}
+        </div>
+      ))}
+      <button type="submit">Register</button>
+    </form>
+  );
+}
+
+export default RegistrationForm;`,
+    concepts: ["Form Handling", "Validation", "Computed Property Names", "e.preventDefault"],
+    explanation: "Using [e.target.name] (computed property key) allows one handleChange to handle all fields. Validation returns an errors object — if non-empty, we block submission. e.preventDefault() stops the page from reloading.",
+  },
+  {
+    id: 10,
+    type: "Coding",
+    difficulty: "Medium",
+    title: "useMemo – Expensive Calculation",
+    description: "Use useMemo to avoid recalculating an expensive operation (e.g., finding prime numbers) on every render.",
+    code: `import { useState, useMemo } from "react";
+
+function isPrime(n) {
+  if (n < 2) return false;
+  for (let i = 2; i <= Math.sqrt(n); i++) {
+    if (n % i === 0) return false;
+  }
+  return true;
+}
+
+function PrimeFinder() {
+  const [limit, setLimit] = useState(100);
+  const [otherState, setOtherState] = useState(0);
+
+  // Only recalculates when 'limit' changes — NOT on otherState change
+  const primes = useMemo(() => {
+    console.log("Recalculating primes...");
+    return Array.from({ length: limit }, (_, i) => i + 2).filter(isPrime);
+  }, [limit]);
+
+  return (
+    <div>
+      <input type="number" value={limit} onChange={e => setLimit(Number(e.target.value))} />
+      <button onClick={() => setOtherState(s => s + 1)}>Trigger Other Re-render ({otherState})</button>
+      <p>Found {primes.length} primes up to {limit}</p>
+    </div>
+  );
+}
+
+export default PrimeFinder;`,
+    concepts: ["useMemo", "Performance Optimization", "Dependency Array"],
+    explanation: "useMemo caches the computed value. The expensive prime search only runs when 'limit' changes. Clicking 'Trigger Other Re-render' does NOT recalculate primes — watch the console to confirm. Use useMemo for computationally heavy derivations, not trivial ones.",
+  },
+  {
+    id: 11,
+    type: "Scenario",
+    difficulty: "Medium",
+    title: "Shopping Cart",
+    description: "Create a product list and a shopping cart. Users should be able to add/remove items and see the total price.",
+    code: `import { useState } from "react";
+
+const products = [
+  { id: 1, name: "React Book", price: 299 },
+  { id: 2, name: "JS Course", price: 499 },
+  { id: 3, name: "NodeJS Guide", price: 349 },
+];
+
+function Cart() {
+  const [cart, setCart] = useState([]);
+
+  const addToCart = (product) => {
+    setCart(prev => {
+      const exists = prev.find(i => i.id === product.id);
+      if (exists) return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
+      return [...prev, { ...product, qty: 1 }];
+    });
+  };
+
+  const removeFromCart = (id) => setCart(cart.filter(i => i.id !== id));
+
+  const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+
+  return (
+    <div style={{ display: "flex", gap: "32px" }}>
+      <div>
+        <h3>Products</h3>
+        {products.map(p => (
+          <div key={p.id}>
+            {p.name} – ₹{p.price}
+            <button onClick={() => addToCart(p)} style={{ marginLeft: "8px" }}>Add</button>
+          </div>
+        ))}
+      </div>
+      <div>
+        <h3>Cart</h3>
+        {cart.length === 0 ? <p>Empty</p> : cart.map(i => (
+          <div key={i.id}>
+            {i.name} x{i.qty} – ₹{i.price * i.qty}
+            <button onClick={() => removeFromCart(i.id)}>Remove</button>
+          </div>
+        ))}
+        <strong>Total: ₹{total}</strong>
+      </div>
+    </div>
+  );
+}
+
+export default Cart;`,
+    concepts: ["Complex State", "Array Immutability", "Derived State (total)", "reduce"],
+    explanation: "When adding, we check if the item already exists. If yes, increment qty; if not, push with qty: 1. The total is derived with reduce — not stored in state (avoids sync issues). Immutable updates with .map() and .filter() are key.",
+  },
+  {
+    id: 12,
+    type: "UI",
+    difficulty: "Medium",
+    title: "Star Rating Component",
+    description: "Build a reusable star rating component where users can click to set a rating and hover to preview it.",
+    code: `import { useState } from "react";
+
+function StarRating({ maxStars = 5, onRate }) {
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+
+  return (
+    <div style={{ display: "flex", gap: "4px", fontSize: "32px", cursor: "pointer" }}>
+      {Array.from({ length: maxStars }, (_, i) => i + 1).map(star => (
+        <span
+          key={star}
+          style={{ color: star <= (hover || rating) ? "#facc15" : "#d1d5db" }}
+          onClick={() => { setRating(star); onRate?.(star); }}
+          onMouseEnter={() => setHover(star)}
+          onMouseLeave={() => setHover(0)}
+        >
+          ★
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// Usage
+export default function App() {
+  return <StarRating maxStars={5} onRate={(r) => console.log("Rated:", r)} />;
+}`,
+    concepts: ["Hover State", "Reusable Components", "Props", "Optional Chaining"],
+    explanation: "Two states: rating (permanent) and hover (temporary preview). We show (hover || rating) so hover takes priority while hovering. onRate?.() uses optional chaining so the component works even without that prop. maxStars makes it reusable.",
+  },
+  {
+    id: 13,
+    type: "Coding",
+    difficulty: "Hard",
+    title: "Custom useDebounce Hook",
+    description: "Create a custom useDebounce hook and use it in a search input that delays the API call by 500ms.",
+    code: `import { useState, useEffect } from "react";
+
+// Custom Hook
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer); // Cleanup: cancel previous timer
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
+// Component using the hook
+function SearchWithDebounce() {
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 500);
+
+  useEffect(() => {
+    if (debouncedQuery) {
+      console.log("API call with:", debouncedQuery);
+      // fetch(\`/api/search?q=\${debouncedQuery}\`)
+    }
+  }, [debouncedQuery]);
+
+  return (
+    <div>
+      <input
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+        placeholder="Search (debounced 500ms)..."
+      />
+      <p>Searching for: <strong>{debouncedQuery}</strong></p>
+    </div>
+  );
+}
+
+export default SearchWithDebounce;`,
+    concepts: ["Custom Hooks", "useEffect Cleanup", "Debouncing", "Performance"],
+    explanation: "The hook sets a timer on every value change. If value changes again before the timer fires, clearTimeout cancels it (cleanup function). This ensures the API is called only after the user stops typing for 500ms — critical for search performance.",
+  },
+  {
+    id: 14,
+    type: "Scenario",
+    difficulty: "Hard",
+    title: "Pagination Component",
+    description: "Fetch 100 items from an API and display them paginated, with 10 items per page and prev/next navigation.",
+    code: `import { useState, useEffect } from "react";
+
+const ITEMS_PER_PAGE = 10;
+
+function Pagination() {
+  const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("https://jsonplaceholder.typicode.com/posts")
+      .then(res => res.json())
+      .then(data => { setPosts(data); setLoading(false); });
+  }, []);
+
+  const totalPages = Math.ceil(posts.length / ITEMS_PER_PAGE);
+  const start = (page - 1) * ITEMS_PER_PAGE;
+  const currentItems = posts.slice(start, start + ITEMS_PER_PAGE);
+
+  return (
+    <div>
+      {loading ? <p>Loading...</p> : (
+        <>
+          {currentItems.map(p => <p key={p.id}><strong>{p.id}.</strong> {p.title}</p>)}
+          <div>
+            <button onClick={() => setPage(p => p - 1)} disabled={page === 1}>Prev</button>
+            <span> Page {page} of {totalPages} </span>
+            <button onClick={() => setPage(p => p + 1)} disabled={page === totalPages}>Next</button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default Pagination;`,
+    concepts: ["Pagination Logic", "Array.slice", "Derived State", "useEffect"],
+    explanation: "All data is fetched once. Pagination is done client-side by slicing the array. currentItems and totalPages are derived from state — recalculated on each render without extra state. Disabling buttons at boundaries prevents invalid pages.",
+  },
+  {
+    id: 15,
+    type: "Coding",
+    difficulty: "Hard",
+    title: "useReducer – Complex State",
+    description: "Refactor the shopping cart from multiple useState calls to a single useReducer for cleaner state management.",
+    code: `import { useReducer } from "react";
+
+const initialState = { items: [], total: 0 };
+
+function cartReducer(state, action) {
+  switch (action.type) {
+    case "ADD": {
+      const existing = state.items.find(i => i.id === action.payload.id);
+      const items = existing
+        ? state.items.map(i => i.id === action.payload.id ? { ...i, qty: i.qty + 1 } : i)
+        : [...state.items, { ...action.payload, qty: 1 }];
+      return { items, total: state.total + action.payload.price };
+    }
+    case "REMOVE": {
+      const item = state.items.find(i => i.id === action.payload);
+      return {
+        items: state.items.filter(i => i.id !== action.payload),
+        total: state.total - item.price * item.qty,
+      };
+    }
+    case "CLEAR":
+      return initialState;
+    default:
+      return state;
+  }
+}
+
+function Cart() {
+  const [state, dispatch] = useReducer(cartReducer, initialState);
+
+  return (
+    <div>
+      <button onClick={() => dispatch({ type: "ADD", payload: { id: 1, name: "Book", price: 100 } })}>
+        Add Book ₹100
+      </button>
+      <button onClick={() => dispatch({ type: "CLEAR" })}>Clear</button>
+      {state.items.map(i => (
+        <div key={i.id}>
+          {i.name} x{i.qty}
+          <button onClick={() => dispatch({ type: "REMOVE", payload: i.id })}>Remove</button>
+        </div>
+      ))}
+      <strong>Total: ₹{state.total}</strong>
+    </div>
+  );
+}
+
+export default Cart;`,
+    concepts: ["useReducer", "Action/Dispatch Pattern", "Predictable State", "Switch Case"],
+    explanation: "useReducer is ideal when multiple state values are related or transitions are complex. The reducer is a pure function (same input → same output). Actions describe WHAT happened; reducer decides HOW state changes. This makes state transitions predictable and testable.",
+  },
+  {
+    id: 16,
+    type: "Scenario",
+    difficulty: "Hard",
+    title: "Context API – Theme Switcher",
+    description: "Implement a global dark/light theme toggle using React Context API, accessible from any nested component.",
+    code: `import { createContext, useContext, useState } from "react";
+
+// 1. Create Context
+const ThemeContext = createContext();
+
+// 2. Provider wraps the app
+function ThemeProvider({ children }) {
+  const [isDark, setIsDark] = useState(false);
+  const toggle = () => setIsDark(d => !d);
+
+  return (
+    <ThemeContext.Provider value={{ isDark, toggle }}>
+      <div style={{
+        minHeight: "100vh",
+        background: isDark ? "#1e293b" : "#f8fafc",
+        color: isDark ? "#f1f5f9" : "#0f172a",
+        padding: "24px",
+        transition: "all 0.3s"
+      }}>
+        {children}
+      </div>
+    </ThemeContext.Provider>
+  );
+}
+
+// 3. Custom hook to consume context
+function useTheme() {
+  return useContext(ThemeContext);
+}
+
+// 4. Deeply nested component consumes without prop drilling
+function Navbar() {
+  const { isDark, toggle } = useTheme();
+  return (
+    <nav>
+      <strong>MyApp</strong>
+      <button onClick={toggle} style={{ marginLeft: "16px" }}>
+        {isDark ? "☀️ Light" : "🌙 Dark"}
+      </button>
+    </nav>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <Navbar />
+      <p>Theme is applied globally!</p>
+    </ThemeProvider>
+  );
+}
+
+export default App;`,
+    concepts: ["Context API", "Prop Drilling Solution", "Custom Hook", "Provider Pattern"],
+    explanation: "Context solves prop drilling — passing state through many intermediate components. createContext creates the context; Provider makes value available to the tree; useContext consumes it. The custom useTheme hook wraps useContext for cleaner imports.",
+  },
+  {
+    id: 17,
+    type: "UI",
+    difficulty: "Hard",
+    title: "Drag-and-Drop List (Manual)",
+    description: "Build a reorderable list using HTML5 drag-and-drop events without any external library.",
+    code: `import { useState, useRef } from "react";
+
+const initialItems = ["React", "JavaScript", "TypeScript", "CSS", "HTML"];
+
+function DraggableList() {
+  const [items, setItems] = useState(initialItems);
+  const dragIndex = useRef(null);
+
+  const handleDragStart = (i) => { dragIndex.current = i; };
+
+  const handleDrop = (i) => {
+    const newItems = [...items];
+    const dragged = newItems.splice(dragIndex.current, 1)[0];
+    newItems.splice(i, 0, dragged);
+    setItems(newItems);
+    dragIndex.current = null;
+  };
+
+  return (
+    <ul style={{ listStyle: "none", padding: 0, width: "220px" }}>
+      {items.map((item, i) => (
+        <li
+          key={item}
+          draggable
+          onDragStart={() => handleDragStart(i)}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={() => handleDrop(i)}
+          style={{ padding: "10px 16px", marginBottom: "6px", background: "#dbeafe", borderRadius: "6px", cursor: "grab", userSelect: "none" }}
+        >
+          ⠿ {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default DraggableList;`,
+    concepts: ["HTML5 Drag and Drop", "useRef", "Array Splice", "Event Handlers"],
+    explanation: "dragIndex ref (not state) stores the dragged item's index — refs don't cause re-renders. onDragOver must call e.preventDefault() to allow dropping. The drop handler splices the dragged item out and inserts it at the new position immutably.",
+  },
+  {
+    id: 18,
+    type: "Coding",
+    difficulty: "Hard",
+    title: "Custom useLocalStorage Hook",
+    description: "Build a custom hook that syncs state with localStorage, persisting it across page refreshes.",
+    code: `import { useState } from "react";
+
+function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch {
+      return initialValue;
+    }
+  });
+
+  const setValue = (value) => {
+    try {
+      // Allow function updates like useState
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return [storedValue, setValue];
+}
+
+// Usage
+function ThemeToggle() {
+  const [theme, setTheme] = useLocalStorage("theme", "light");
+
+  return (
+    <div style={{ background: theme === "dark" ? "#1e293b" : "#fff", color: theme === "dark" ? "#fff" : "#000", padding: "20px" }}>
+      <p>Current theme: {theme}</p>
+      <button onClick={() => setTheme(t => t === "light" ? "dark" : "light")}>
+        Toggle Theme
+      </button>
+      <p>Refresh the page — theme persists!</p>
+    </div>
+  );
+}
+
+export default ThemeToggle;`,
+    concepts: ["Custom Hooks", "localStorage", "Lazy Initialization", "JSON Serialization"],
+    explanation: "The lazy initializer function (() => {...}) in useState runs only once on mount — perfect for reading localStorage. We support functional updates (value instanceof Function) to match useState's API. JSON.parse/stringify handles non-string values.",
+  },
+  {
+    id: 19,
+    type: "Scenario",
+    difficulty: "Hard",
+    title: "Infinite Scroll",
+    description: "Implement infinite scrolling that loads more posts as the user scrolls to the bottom of the page using IntersectionObserver.",
+    code: `import { useState, useEffect, useRef, useCallback } from "react";
+
+function InfiniteScroll() {
+  const [posts, setPosts] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const observer = useRef(null);
+
+  const fetchPosts = useCallback(async (pageNum) => {
+    setLoading(true);
+    const res = await fetch(\`https://jsonplaceholder.typicode.com/posts?_page=\${pageNum}&_limit=10\`);
+    const data = await res.json();
+    setPosts(prev => [...prev, ...data]);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchPosts(page); }, [page]);
+
+  // Ref callback for the last element sentinel
+  const lastElementRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        setPage(prev => prev + 1);
+      }
+    });
+    if (node) observer.current.observe(node);
+  }, [loading]);
+
+  return (
+    <div>
+      {posts.map((post, i) => (
+        <div key={post.id} ref={i === posts.length - 1 ? lastElementRef : null}
+          style={{ padding: "12px", marginBottom: "8px", border: "1px solid #e5e7eb", borderRadius: "6px" }}>
+          <strong>{post.id}. {post.title}</strong>
+        </div>
+      ))}
+      {loading && <p>Loading more...</p>}
+    </div>
+  );
+}
+
+export default InfiniteScroll;`,
+    concepts: ["IntersectionObserver", "useRef", "useCallback", "Infinite Loading"],
+    explanation: "IntersectionObserver watches the LAST element in the list. When it enters the viewport, we increment the page number, triggering a new fetch. We disconnect the old observer before creating a new one (prevents duplicates). This is far more performant than scroll event listeners.",
+  },
+  {
+    id: 20,
+    type: "Scenario",
+    difficulty: "Hard",
+    title: "Error Boundary",
+    description: "Create an Error Boundary class component that catches runtime errors in its children and shows a fallback UI instead of crashing the whole app.",
+    code: `import { Component, useState } from "react";
+
+// Error Boundaries must be CLASS components
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    // Called when a descendant throws — update state to show fallback
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, info) {
+    // Log to an error reporting service
+    console.error("Caught error:", error, info.componentStack);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: "20px", background: "#fee2e2", borderRadius: "8px", color: "#991b1b" }}>
+          <h3>Something went wrong 😢</h3>
+          <p>{this.state.error?.message}</p>
+          <button onClick={() => this.setState({ hasError: false, error: null })}>Try Again</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+// Buggy component for testing
+function BuggyComponent() {
+  const [crash, setCrash] = useState(false);
+  if (crash) throw new Error("Intentional crash for demo!");
+  return <button onClick={() => setCrash(true)}>Crash Me!</button>;
+}
+
+// App using the boundary
+function App() {
+  return (
+    <div>
+      <h2>Error Boundary Demo</h2>
+      <ErrorBoundary>
+        <BuggyComponent />
+      </ErrorBoundary>
+      <p>This content is outside the boundary — it stays safe!</p>
+    </div>
+  );
+}
+
+export default App;`,
+    concepts: ["Error Boundary", "Class Component", "getDerivedStateFromError", "componentDidCatch"],
+    explanation: "Error Boundaries can ONLY be class components (as of React 18 — no hooks equivalent yet). getDerivedStateFromError updates state to show fallback UI. componentDidCatch is for side effects like logging. Wrap individual sections so one crash doesn't break the whole app.",
+  },
+];
+
+const typeColors = {
+  UI: { bg: "#dbeafe", text: "#1d4ed8", border: "#93c5fd" },
+  Coding: { bg: "#dcfce7", text: "#15803d", border: "#86efac" },
+  Scenario: { bg: "#fef9c3", text: "#854d0e", border: "#fde047" },
+};
+
+const diffColors = {
+  Easy: { bg: "#f0fdf4", text: "#16a34a" },
+  Medium: { bg: "#fff7ed", text: "#c2410c" },
+  Hard: { bg: "#fef2f2", text: "#b91c1c" },
+};
+
+export default function App() {
+  const [selectedId, setSelectedId] = useState(null);
+  const [filter, setFilter] = useState("All");
+  const [diffFilter, setDiffFilter] = useState("All");
+  const [showSolution, setShowSolution] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const selected = problems.find(p => p.id === selectedId);
+
+  const filtered = problems.filter(p => {
+    const typeMatch = filter === "All" || p.type === filter;
+    const diffMatch = diffFilter === "All" || p.difficulty === diffFilter;
+    return typeMatch && diffMatch;
+  });
+
+  const handleCopy = () => {
+    if (selected) {
+      navigator.clipboard.writeText(selected.code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleSelect = (id) => {
+    setSelectedId(id);
+    setShowSolution(false);
+    setCopied(false);
+  };
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)",
+      fontFamily: "'Fira Code', 'Courier New', monospace",
+      color: "#e2e8f0",
+    }}>
+      {/* Header */}
+      <div style={{
+        background: "rgba(255,255,255,0.05)",
+        backdropFilter: "blur(12px)",
+        borderBottom: "1px solid rgba(255,255,255,0.1)",
+        padding: "20px 32px",
+        display: "flex",
+        alignItems: "center",
+        gap: "16px",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+      }}>
+        <div style={{ fontSize: "28px" }}>⚛️</div>
+        <div>
+          <div style={{ fontSize: "20px", fontWeight: "bold", background: "linear-gradient(90deg, #60a5fa, #a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            React Fresher Interview Prep
+          </div>
+          <div style={{ fontSize: "12px", color: "#94a3b8" }}>20 problems · UI · Coding · Scenario</div>
+        </div>
+        <div style={{ marginLeft: "auto", display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          {["All", "UI", "Coding", "Scenario"].map(f => (
+            <button key={f} onClick={() => setFilter(f)} style={{
+              padding: "5px 14px", borderRadius: "20px", border: "1px solid",
+              borderColor: filter === f ? "#60a5fa" : "rgba(255,255,255,0.2)",
+              background: filter === f ? "rgba(96,165,250,0.2)" : "transparent",
+              color: filter === f ? "#60a5fa" : "#94a3b8",
+              cursor: "pointer", fontSize: "12px", fontFamily: "inherit",
+            }}>{f}</button>
+          ))}
+          <div style={{ width: "1px", background: "rgba(255,255,255,0.2)", margin: "0 4px" }} />
+          {["All", "Easy", "Medium", "Hard"].map(d => (
+            <button key={d} onClick={() => setDiffFilter(d)} style={{
+              padding: "5px 14px", borderRadius: "20px", border: "1px solid",
+              borderColor: diffFilter === d ? "#a78bfa" : "rgba(255,255,255,0.2)",
+              background: diffFilter === d ? "rgba(167,139,250,0.2)" : "transparent",
+              color: diffFilter === d ? "#a78bfa" : "#94a3b8",
+              cursor: "pointer", fontSize: "12px", fontFamily: "inherit",
+            }}>{d}</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: "flex", height: "calc(100vh - 81px)" }}>
+        {/* Sidebar */}
+        <div style={{
+          width: "320px",
+          minWidth: "320px",
+          overflowY: "auto",
+          borderRight: "1px solid rgba(255,255,255,0.08)",
+          background: "rgba(255,255,255,0.02)",
+        }}>
+          <div style={{ padding: "12px 16px", fontSize: "11px", color: "#64748b", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            {filtered.length} Problems
+          </div>
+          {filtered.map(p => (
+            <div
+              key={p.id}
+              onClick={() => handleSelect(p.id)}
+              style={{
+                padding: "14px 16px",
+                cursor: "pointer",
+                borderBottom: "1px solid rgba(255,255,255,0.05)",
+                background: selectedId === p.id ? "rgba(96,165,250,0.12)" : "transparent",
+                borderLeft: selectedId === p.id ? "3px solid #60a5fa" : "3px solid transparent",
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={e => { if (selectedId !== p.id) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
+              onMouseLeave={e => { if (selectedId !== p.id) e.currentTarget.style.background = "transparent"; }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                <span style={{
+                  fontSize: "11px", padding: "2px 8px", borderRadius: "12px",
+                  background: typeColors[p.type].bg, color: typeColors[p.type].text,
+                  border: `1px solid ${typeColors[p.type].border}`, fontWeight: "600",
+                }}>{p.type}</span>
+                <span style={{ fontSize: "11px", color: diffColors[p.difficulty].text, fontWeight: "600" }}>
+                  {p.difficulty}
+                </span>
+                <span style={{ marginLeft: "auto", fontSize: "11px", color: "#475569" }}>#{p.id}</span>
+              </div>
+              <div style={{ fontSize: "13px", color: selectedId === p.id ? "#e2e8f0" : "#94a3b8", fontWeight: selectedId === p.id ? "600" : "400" }}>
+                {p.title}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Main Content */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "32px" }}>
+          {!selected ? (
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "16px" }}>
+              <div style={{ fontSize: "64px" }}>👈</div>
+              <div style={{ fontSize: "18px", color: "#64748b" }}>Select a problem to get started</div>
+              <div style={{ fontSize: "13px", color: "#475569" }}>20 React interview questions with full solutions</div>
+            </div>
+          ) : (
+            <div style={{ maxWidth: "860px" }}>
+              {/* Problem Header */}
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", marginBottom: "24px" }}>
+                <div style={{
+                  width: "44px", height: "44px", borderRadius: "10px",
+                  background: "linear-gradient(135deg, #60a5fa, #a78bfa)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "18px", fontWeight: "bold", flexShrink: 0,
+                }}>{selected.id}</div>
+                <div>
+                  <h1 style={{ margin: 0, fontSize: "22px", fontWeight: "700", color: "#f1f5f9" }}>{selected.title}</h1>
+                  <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+                    <span style={{
+                      fontSize: "12px", padding: "3px 10px", borderRadius: "12px",
+                      background: typeColors[selected.type].bg, color: typeColors[selected.type].text,
+                      border: `1px solid ${typeColors[selected.type].border}`, fontWeight: "600",
+                    }}>{selected.type}</span>
+                    <span style={{
+                      fontSize: "12px", padding: "3px 10px", borderRadius: "12px",
+                      background: diffColors[selected.difficulty].bg, color: diffColors[selected.difficulty].text,
+                      fontWeight: "600",
+                    }}>{selected.difficulty}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Problem Description */}
+              <div style={{
+                background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "12px", padding: "20px", marginBottom: "20px",
+              }}>
+                <div style={{ fontSize: "11px", color: "#64748b", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "10px" }}>Problem Statement</div>
+                <p style={{ margin: 0, color: "#cbd5e1", lineHeight: "1.7", fontSize: "15px" }}>{selected.description}</p>
+              </div>
+
+              {/* Key Concepts */}
+              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "20px" }}>
+                {selected.concepts.map(c => (
+                  <span key={c} style={{
+                    padding: "4px 12px", borderRadius: "16px", fontSize: "12px",
+                    background: "rgba(167,139,250,0.15)", color: "#a78bfa",
+                    border: "1px solid rgba(167,139,250,0.3)", fontWeight: "500",
+                  }}>🏷 {c}</span>
+                ))}
+              </div>
+
+              {/* Solution Toggle */}
+              <button
+                onClick={() => setShowSolution(s => !s)}
+                style={{
+                  width: "100%", padding: "14px", borderRadius: "10px",
+                  background: showSolution ? "rgba(96,165,250,0.15)" : "rgba(96,165,250,0.08)",
+                  border: "1px solid rgba(96,165,250,0.3)",
+                  color: "#60a5fa", cursor: "pointer", fontSize: "14px",
+                  fontWeight: "600", fontFamily: "inherit", marginBottom: "16px",
+                  transition: "all 0.2s", letterSpacing: "0.02em",
+                }}
+              >
+                {showSolution ? "▼  Hide Solution" : "▶  Reveal Solution"}
+              </button>
+
+              {showSolution && (
+                <div>
+                  {/* Code Block */}
+                  <div style={{
+                    background: "#0d1117", borderRadius: "12px",
+                    border: "1px solid rgba(255,255,255,0.1)", overflow: "hidden", marginBottom: "20px",
+                  }}>
+                    <div style={{
+                      display: "flex", alignItems: "center", padding: "12px 16px",
+                      borderBottom: "1px solid rgba(255,255,255,0.08)",
+                      background: "rgba(255,255,255,0.03)",
+                    }}>
+                      <div style={{ display: "flex", gap: "6px" }}>
+                        <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#ef4444" }} />
+                        <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#f59e0b" }} />
+                        <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#22c55e" }} />
+                      </div>
+                      <span style={{ marginLeft: "12px", fontSize: "12px", color: "#475569" }}>{selected.title}.jsx</span>
+                      <button
+                        onClick={handleCopy}
+                        style={{
+                          marginLeft: "auto", padding: "4px 12px", borderRadius: "6px",
+                          background: copied ? "rgba(34,197,94,0.2)" : "rgba(255,255,255,0.05)",
+                          border: copied ? "1px solid rgba(34,197,94,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                          color: copied ? "#22c55e" : "#94a3b8", cursor: "pointer",
+                          fontSize: "11px", fontFamily: "inherit",
+                        }}
+                      >{copied ? "✓ Copied!" : "⎘ Copy"}</button>
+                    </div>
+                    <pre style={{
+                      margin: 0, padding: "20px", overflowX: "auto",
+                      fontSize: "13px", lineHeight: "1.65",
+                      color: "#e2e8f0",
+                    }}>
+                      <code>{selected.code}</code>
+                    </pre>
+                  </div>
+
+                  {/* Explanation */}
+                  <div style={{
+                    background: "rgba(250,204,21,0.06)", border: "1px solid rgba(250,204,21,0.2)",
+                    borderRadius: "12px", padding: "20px",
+                  }}>
+                    <div style={{ fontSize: "11px", color: "#854d0e", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
+                      <span>💡</span> Explanation
+                    </div>
+                    <p style={{ margin: 0, color: "#fef3c7", lineHeight: "1.75", fontSize: "14px" }}>{selected.explanation}</p>
+                  </div>
+
+                  {/* Navigation */}
+                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: "24px" }}>
+                    <button
+                      disabled={selected.id === 1}
+                      onClick={() => handleSelect(selected.id - 1)}
+                      style={{
+                        padding: "10px 20px", borderRadius: "8px",
+                        background: selected.id === 1 ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.06)",
+                        border: "1px solid rgba(255,255,255,0.1)", color: selected.id === 1 ? "#334155" : "#94a3b8",
+                        cursor: selected.id === 1 ? "not-allowed" : "pointer",
+                        fontFamily: "inherit", fontSize: "13px",
+                      }}
+                    >← Previous</button>
+                    <button
+                      disabled={selected.id === 20}
+                      onClick={() => handleSelect(selected.id + 1)}
+                      style={{
+                        padding: "10px 20px", borderRadius: "8px",
+                        background: selected.id === 20 ? "rgba(255,255,255,0.03)" : "rgba(96,165,250,0.15)",
+                        border: "1px solid",
+                        borderColor: selected.id === 20 ? "rgba(255,255,255,0.1)" : "rgba(96,165,250,0.4)",
+                        color: selected.id === 20 ? "#334155" : "#60a5fa",
+                        cursor: selected.id === 20 ? "not-allowed" : "pointer",
+                        fontFamily: "inherit", fontSize: "13px", fontWeight: "600",
+                      }}
+                    >Next →</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 
 
 
