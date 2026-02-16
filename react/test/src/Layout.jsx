@@ -27,7 +27,17 @@ export default function Layout() {
         <Link to="/test1">Debounced</Link>
         <Link to="/test2">Modal</Link>
         <Link to="/test3">Infinite Scroll</Link>
-
+        {/* p-demo1 */}
+        <Link to="/p-demo1">Pagination</Link>
+        <Link to="/p-demo2">Filter</Link>
+        <Link to="/p-demo3">Copy to Clipboard</Link>
+        <Link to="/p-demo4">Close Modal</Link>
+        <Link to="/p-demo5">Cleanup</Link>
+        <Link to="/p-demo6">AbortController</Link>
+        <Link to="/p-demo7">error</Link>
+        <Link to="/p-demo8">Add / Remove</Link>
+        <Link to="/p-demo9">Throttle</Link>
+        <Link to="/p-demo10">Debounce</Link>
       </nav>
 
       <hr />

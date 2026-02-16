@@ -24,6 +24,16 @@ import Test1 from "./D3/Test1";
 import Test2 from "./D3/Test2";
 import { useState } from "react";
 import Test3 from "./D3/Test3";
+import Pdemo1 from "./D4/Pdemo1";
+import Pdemo2 from "./D4/Pdemo2";
+import Pdemo3 from "./D4/Pdemo3";
+import Pdemo4 from "./D4/Pdemo4";
+import Pdemo5 from "./D4/Pdemo5";
+import Pdemo6 from "./D4/Pdemo6";
+import Pdemo7 from "./D4/Pdemo7";
+import Pdemo8 from "./D4/Pdemo8";
+import Pdemo9 from "./D4/Pdemo9";
+import Pdemo10 from "./D4/Pdemo10";
 
 export default function App() {
   const [open, setOpen] = useState(true);
@@ -59,7 +69,16 @@ export default function App() {
             element={<Test2 open={open} onClose={() => setOpen(false)} />}
           />
           <Route path="test3" element={<Test3 />} />
-          {/* 404 Route */}
+          <Route path="p-demo1" element={<Pdemo1 />} />
+          <Route path="p-demo2" element={<Pdemo2 />} />
+          <Route path="p-demo3" element={<Pdemo3 />} />
+          <Route path="p-demo4" element={<Pdemo4 />} />
+          <Route path="p-demo5" element={<Pdemo5 />} />
+          <Route path="p-demo6" element={<Pdemo6 />} />
+          <Route path="p-demo7" element={<Pdemo7 />} />
+          <Route path="p-demo8" element={<Pdemo8 />} />
+          <Route path="p-demo9" element={<Pdemo9 />} />
+          <Route path="p-demo10" element={<Pdemo10 />} />
           <Route path="*" element={<h2>Page Not Found</h2>} />
         </Route>
       </Routes>
